@@ -3,7 +3,6 @@ include 'auth_check.php';
 require '../config/db.php';
 include '../includes/header.php';
 
-
 function execute_stmt($conn, $sql, $types, $params, $fetch_assoc = false) {
     $stmt = $conn->prepare($sql);
     if (!$stmt) {
