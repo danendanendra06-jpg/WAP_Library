@@ -27,8 +27,6 @@ function execute_stmt($conn, $sql, $types, $params, $fetch_assoc = false) {
     $stmt->close();
     return $success;
 }
-
-
 if (isset($_GET['hapus'])) {
     $id = intval($_GET['hapus']);
 
