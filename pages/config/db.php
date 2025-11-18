@@ -1,8 +1,8 @@
 <?php
-$host = "localhost";
-$user = "root";
-$pass = "";
-$db   = "projek_perpus";
+$host = "db";       // <-- HARUS 'db' (nama layanan di docker-compose)
+$user = "root";     // <-- 'root' (default, atau buat pengguna baru)
+$pass = "root";     // <-- HARUS 'root' (sesuai dengan docker-compose)
+$db   = "projek_perpus"; // <-- Nama database
 
 $conn = new mysqli($host, $user, $pass, $db);
 
