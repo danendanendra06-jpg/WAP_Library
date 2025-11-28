@@ -9,7 +9,7 @@ on:
 jobs:
   php-lint:
     # Karena kamu sudah setup runner di laptop, kita pakai itu lagi
-    runs-on: self-hosted
+    runs-on: my_laptop
     
     steps:
     # 1. Ambil kodingan terbaru dari repository
