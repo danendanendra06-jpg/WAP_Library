@@ -8,19 +8,16 @@ on:
 
 jobs:
   php-lint:
-    # Karena kamu sudah setup runner di laptop, kita pakai itu lagi
     runs-on: my_laptop
     
     steps:
-    # 1. Ambil kodingan terbaru dari repository
-    - name: Checkout Code
+    - name: WAP_Library
       uses: actions/checkout@v3
 
-    # 2. Cek Versi PHP yang terinstall di laptop
+
     - name: Check PHP Version
       run: php -v
 
-    # 3. Cek Syntax Error di semua file .php (Linting)
-    # Perintah ini akan mencari semua file .php dan mengeceknya satu per satu
+
     - name: Run PHP Lint (Syntax Check)
       run: find . -name "*.php" -print0 | xargs -0 -n1 php -l
