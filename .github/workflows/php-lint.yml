@@ -1,0 +1,20 @@
+name: PHP Lint
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  php-lint:
+    runs-on: ubuntu-latest  # <-- memakai runner GitHub, otomatis
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check PHP Version
+        run: php -v
+
+      - name: Run PHP Lint
+        run: find . -name "*.php" -print0 | xargs -0 -n1 php -l
