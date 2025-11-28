@@ -1,0 +1,22 @@
+name: Hello World Workflow
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  greeting:
+    runs-on: my_laptop   # <-- SUDAH DIGANTI (Biar tidak error Queued lagi)
+    
+    steps:
+      - name: Say Hello
+        run: echo "Hello, World!"
+
+      - name: Show Date and Time
+        run: echo "Current time is $(date)"
+
+      - name: Show GitHub Info
+        run: |
+          echo "Repository: ${{ github.repository }}"
+          echo "Branch: ${{ github.ref }}"
+          echo "Commit: ${{ github.sha }}"
