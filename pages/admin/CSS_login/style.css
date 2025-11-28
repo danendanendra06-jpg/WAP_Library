@@ -1,0 +1,92 @@
+ body {
+        background: linear-gradient(135deg, #004e92, #000428);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .login-container {
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        width: 370px;
+        padding: 30px 25px;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+
+    .login-container:hover {
+        transform: translateY(-5px);
+    }
+
+    h4 {
+        color: #004e92;
+        font-weight: 700;
+        margin-bottom: 25px;
+    }
+
+    label {
+        font-weight: 500;
+        color: #333;
+        text-align: left;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    input.form-control {
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 15px;
+        transition: 0.2s;
+    }
+
+    input.form-control:focus {
+        border-color: #0467beff;
+        box-shadow: 0 0 5px rgba(0,78,146,0.4);
+    }
+
+    .btn-login {
+        background: linear-gradient(90deg, #0467beff, #007aff);
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 10px;
+        padding: 10px;
+        transition: background 0.3s;
+    }
+
+    .btn-login:hover {
+        background: linear-gradient(90deg, #0467beff, #005ecb);
+    }
+
+    .btn-guest {
+        border: 2px solid #0467beff;
+        color: #0467beff;
+        border-radius: 10px;
+        font-weight: 500;
+        padding: 10px;
+        background-color: transparent;
+        transition: all 0.3s ease;
+    }
+
+    .btn-guest:hover {
+        background: #0467beff;
+        color: white;
+    }
+
+    a {
+        color: #0467beff;
+        font-size: 14px;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    .alert {
+        font-size: 14px;
+    }
