@@ -11,21 +11,16 @@ function execute_stmt($conn, $sql, $types, $params, $fetch_assoc = false) {
     if ($types && $params) {
         $stmt->bind_param($types, ...$params);
     }
-
     $success = $stmt->execute();
-    
     if ($fetch_assoc) {
         $result = $stmt->get_result();
         $data = $result ? $result->fetch_assoc() : null;
         $stmt->close();
         return $data;
     }
-    
     $stmt->close();
     return $success;
 }
-
-
 $mode = $_GET['mode'] ?? 'list';
 $id = isset($_GET['id']) ? intval($_GET['id']) : null; 
 $dendaRow = $conn->query("SELECT harga_denda FROM tbl_biaya_denda WHERE stat='Aktif' LIMIT 1")->fetch_assoc();
@@ -89,8 +84,6 @@ if ($mode === 'edit' && $id && isset($_POST['update'])) {
     }
     exit;
 }
-
-
 if ($mode === 'list') {
     $sql = "SELECT d.id_denda, d.pinjam_id, d.denda, d.lama_waktu, d.tgl_denda, 
                   COALESCE(m.nama_lengkap, 'Member Dihapus') AS nama_anggota, 
@@ -141,9 +134,7 @@ if ($mode === 'list') {
         <?php endif; ?>
       </tbody>
     </table>
-
     <hr class="my-5">
-
     <h4 class="mb-3">📚 Data Peminjaman Buku</h4>
     <?php
     $pinjam = $conn->query("
@@ -291,4 +282,5 @@ if ($mode === 'edit' && $id) {
 }
 
 include '../includes/footer.php';
+
 ?>

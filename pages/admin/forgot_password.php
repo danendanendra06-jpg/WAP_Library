@@ -1,9 +1,7 @@
 <?php
 include "../config/db.php";
 
-
 $message = "";
-
 if (isset($_POST['submit'])) {
     $username = $_POST['username'];
     $new_password = md5($_POST['new_password']);
@@ -55,3 +53,4 @@ if (isset($_POST['submit'])) {
 </div>
 </body>
 </html>
+
