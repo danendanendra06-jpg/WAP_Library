@@ -21,30 +21,30 @@ jobs:
         echo "✅ Found project at: $PROJECT_PATH"
 
     - name: Pull latest changes
-      working-directory: ${{ env.PROJECT_PATH }}
+      working-directory: ${{ github.workspace }}
       run: |
         git fetch origin master
         git reset --hard origin/master
 
     - name: Stop existing containers
-      working-directory: ${{ env.PROJECT_PATH }}
+      working-directory: ${{ github.workspace }}
       run: |
         docker compose down || true
 
     - name: Remove old images
-      working-directory: ${{ env.PROJECT_PATH }}
+      working-directory: ${{ github.workspace }}
       run: |
         docker system prune -f
         docker image prune -a -f
 
     - name: Build and start containers
-      working-directory: ${{ env.PROJECT_PATH }}
+      working-directory: ${{ github.workspace }}
       run: |
         docker compose build --no-cache
         docker compose up -d
 
     - name: Wait for services to be ready
-      working-directory: ${{ env.PROJECT_PATH }}
+      working-directory: ${{ github.workspace }}
       run: |
         sleep 30
         docker compose ps
@@ -77,30 +77,30 @@ jobs:
         echo "✅ Found project at: $PROJECT_PATH"
 
     - name: Pull latest changes
-      working-directory: ${{ env.PROJECT_PATH }}
+      working-directory: ${{ github.workspace }}
       run: |
         git fetch origin master
         git reset --hard origin/master
 
     - name: Stop existing containers
-      working-directory: ${{ env.PROJECT_PATH }}
+      working-directory: ${{ github.workspace }}
       run: |
         docker compose down || true
 
     - name: Remove old images
-      working-directory: ${{ env.PROJECT_PATH }}
+      working-directory: ${{ github.workspace }}
       run: |
         docker system prune -f
         docker image prune -a -f
 
     - name: Build and start containers
-      working-directory: ${{ env.PROJECT_PATH }}
+      working-directory: ${{ github.workspace }}
       run: |
         docker compose build --no-cache
         docker compose up -d
 
     - name: Wait for services to be ready
-      working-directory: ${{ env.PROJECT_PATH }}
+      working-directory: ${{ github.workspace }}
       run: |
         sleep 30
         docker compose ps
