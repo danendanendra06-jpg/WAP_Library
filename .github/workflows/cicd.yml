@@ -1,4 +1,4 @@
-name: CI/CD Auto Pull and Rebuild (Aman)
+name: CI/CD Auto Pull and Rebuild
 
 on:
   push:
