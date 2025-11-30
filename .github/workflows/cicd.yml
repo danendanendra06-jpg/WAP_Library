@@ -41,3 +41,34 @@ jobs:
         if: always()
         run: |
           echo "Status: ${{ job.status }}"
+
+  deploy_my_laptop:
+    runs-on: [my_laptop]
+    continue-on-error: true
+    steps:
+
+      - name: Set project path (fixed)
+        run: echo "PROJECT_PATH=/home/husain/WAP_Library" >> $GITHUB_ENV
+
+      - name: Pull latest changes
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          git fetch origin master
+          git reset --hard origin/master
+
+      - name: Restart Docker Compose
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          docker compose down || true
+          docker compose up -d --build
+
+      - name: Health Check
+        env:
+          HEALTH_PORT: 8080
+        run: |
+          curl -f http://localhost:$HEALTH_PORT || echo "⚠ Health check gagal"
+
+      - name: Notify Result
+        if: always()
+        run: |
+          echo "Status: ${{ job.status }}"
