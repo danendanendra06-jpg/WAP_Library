@@ -7,113 +7,95 @@ on:
 
 jobs:
   my_laptop:
-    runs-on: [my_laptop]
-    
-    steps:
-    - name: Set project path
-      run: |
-        PROJECT_PATH=$(find /home -name 'WAP_Library' -type d 2>/dev/null | head -1)
-        if [ -z "$PROJECT_PATH" ]; then
-          echo "❌ Error: Folder WAP_Library tidak ditemukan di /home"
-          exit 1
-        fi
-        echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
-        echo "✅ Found project at: $PROJECT_PATH"
+  runs-on: [my_laptop]
 
-    - name: Pull latest changes
-      working-directory: ${{ github.workspace }}
-      run: |
-        git fetch origin master
-        git reset --hard origin/master
+  steps:
+  - name: Checkout repository
+    uses: actions/checkout@v4
 
-    - name: Stop existing containers
-      working-directory: ${{ github.workspace }}
-      run: |
-        docker compose down || true
+  - name: Pull latest changes
+    working-directory: ${{ github.workspace }}
+    run: |
+      git fetch origin master
+      git reset --hard origin/master
 
-    - name: Remove old images
-      working-directory: ${{ github.workspace }}
-      run: |
-        docker system prune -f
-        docker image prune -a -f
+  - name: Stop existing containers
+    working-directory: ${{ github.workspace }}
+    run: |
+      docker compose down || true
 
-    - name: Build and start containers
-      working-directory: ${{ github.workspace }}
-      run: |
-        docker compose build --no-cache
-        docker compose up -d
+  - name: Remove old images
+    run: |
+      docker system prune -f
+      docker image prune -a -f
 
-    - name: Wait for services to be ready
-      working-directory: ${{ github.workspace }}
-      run: |
-        sleep 30
-        docker compose ps
+  - name: Build and start containers
+    working-directory: ${{ github.workspace }}
+    run: |
+      docker compose build --no-cache
+      docker compose up -d
 
-    - name: Health check
-      run: |
-        curl -f http://localhost:8080 || exit 1
+  - name: Wait for services to be ready
+    run: |
+      sleep 30
+      docker compose -f ${{ github.workspace }}/docker-compose.yml ps
 
-    - name: Notify deployment status
-      if: always()
-      run: |
-        if [ ${{ job.status }} == 'success' ]; then
-          echo "✅ Deployment berhasil!"
-        else
-          echo "❌ Deployment gagal!"
-        fi
+  - name: Health check
+    run: |
+      curl -f http://localhost:8080 || exit 1
 
-  laptop_husain:
-    runs-on: [laptop_husain]
-    
-    steps:
-    - name: Set project path
-      run: |
-        PROJECT_PATH=$(find /home -name 'WAP_Library' -type d 2>/dev/null | head -1)
-        if [ -z "$PROJECT_PATH" ]; then
-          echo "❌ Error: Folder WAP_Library tidak ditemukan di /home"
-          exit 1
-        fi
-        echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
-        echo "✅ Found project at: $PROJECT_PATH"
+  - name: Notify deployment status
+    if: always()
+    run: |
+      if [ ${{ job.status }} == 'success' ]; then
+        echo "✅ Deployment berhasil!"
+      else
+        echo "❌ Deployment gagal!"
+      fi
+laptop_husain:
+  runs-on: [laptop_husain]
 
-    - name: Pull latest changes
-      working-directory: ${{ github.workspace }}
-      run: |
-        git fetch origin master
-        git reset --hard origin/master
+  steps:
+  - name: Checkout repository
+    uses: actions/checkout@v4
 
-    - name: Stop existing containers
-      working-directory: ${{ github.workspace }}
-      run: |
-        docker compose down || true
+  - name: Pull latest changes
+    working-directory: ${{ github.workspace }}
+    run: |
+      git fetch origin master
+      git reset --hard origin/master
 
-    - name: Remove old images
-      working-directory: ${{ github.workspace }}
-      run: |
-        docker system prune -f
-        docker image prune -a -f
+  - name: Stop existing containers
+    working-directory: ${{ github.workspace }}
+    run: |
+      docker compose down || true
 
-    - name: Build and start containers
-      working-directory: ${{ github.workspace }}
-      run: |
-        docker compose build --no-cache
-        docker compose up -d
+  - name: Remove old images
+    run: |
+      docker system prune -f
+      docker image prune -a -f
 
-    - name: Wait for services to be ready
-      working-directory: ${{ github.workspace }}
-      run: |
-        sleep 30
-        docker compose ps
+  - name: Build and start containers
+    working-directory: ${{ github.workspace }}
+    run: |
+      docker compose build --no-cache
+      docker compose up -d
 
-    - name: Health check
-      run: |
-        curl -f http://localhost:8080 || exit 1
+  - name: Wait for services to be ready
+    run: |
+      sleep 30
+      docker compose -f ${{ github.workspace }}/docker-compose.yml ps
 
-    - name: Notify deployment status
-      if: always()
-      run: |
-        if [ ${{ job.status }} == 'success' ]; then
-          echo "✅ Deployment berhasil!"
-        else
-          echo "❌ Deployment gagal!"
-        fi
+  - name: Health check
+    run: |
+      curl -f http://localhost:8080 || exit 1
+
+  - name: Notify deployment status
+    if: always()
+    run: |
+      if [ ${{ job.status }} == 'success' ]; then
+        echo "✅ Deployment berhasil!"
+      else
+        echo "❌ Deployment gagal!"
+      fi
+
