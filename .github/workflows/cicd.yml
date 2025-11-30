@@ -32,7 +32,7 @@ jobs:
   # DEPLOY KE LAPTOP HUSAIN
   # =========================================
   deploy-husain:
-    runs-on: [laptop-Husain]  # label runner Husain
+    runs-on: [laptop_Husain]  # label runner Husain
     
     steps:
       - name: Set project path
