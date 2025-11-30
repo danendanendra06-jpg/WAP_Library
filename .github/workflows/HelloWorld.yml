@@ -14,7 +14,7 @@ jobs:
     runs-on: [my_laptop]
 
     steps:
-      # Step 1: Checkout kode (WAJIB untuk self-hosted runner)
+      # Step 1: Checkout kode (WAJIB)
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -25,7 +25,7 @@ jobs:
           echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
           echo "📁 Project Path: $PROJECT_PATH"
 
-      # Step 3: Pull update dari GitHub ke folder project lokal
+      # Step 3: Pull update dari GitHub
       - name: Pull latest changes
         working-directory: ${{ env.PROJECT_PATH }}
         run: |
@@ -40,9 +40,9 @@ jobs:
           docker compose up -d --build
 
   # =====================================================
-  # JOB 2 — DEPLOY KE LAPTOP TEMAN (laptop_Nashwan)
+  # JOB 2 — DEPLOY KE LAPTOP HUSAIN
   # =====================================================
-  deploy_nashwan:
+  deploy_husain:
     runs-on: [laptop_husain]
 
     steps:
@@ -65,8 +65,4 @@ jobs:
           git reset --hard origin/master
 
       # Step 4: Restart Docker
-      - name: Restart Docker Containers
-        working-directory: ${{ env.PROJECT_PATH }}
-        run: |
-          docker compose down || true
-          docker compose up -d --build
+      - name: Restart Docker Contain
