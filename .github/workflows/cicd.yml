@@ -12,9 +12,9 @@ jobs:
     steps:
     - name: Set project path
       run: |
-        PROJECT_PATH=$(find /home -name 'Projet_3' -type d 2>/dev/null | head -1)
+        PROJECT_PATH=$(find /home -name 'WAP_Library' -type d 2>/dev/null | head -1)
         if [ -z "$PROJECT_PATH" ]; then
-          echo "❌ Error: Folder Projet_3 tidak ditemukan di /home"
+          echo "❌ Error: Folder WAP_Library tidak ditemukan di /home"
           exit 1
         fi
         echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
@@ -68,9 +68,9 @@ jobs:
     steps:
     - name: Set project path
       run: |
-        PROJECT_PATH=$(find /home -name 'Projet_3' -type d 2>/dev/null | head -1)
+        PROJECT_PATH=$(find /home -name 'WAP_Library' -type d 2>/dev/null | head -1)
         if [ -z "$PROJECT_PATH" ]; then
-          echo "❌ Error: Folder Projet_3 tidak ditemukan di /home"
+          echo "❌ Error: Folder WAP_Library tidak ditemukan di /home"
           exit 1
         fi
         echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
