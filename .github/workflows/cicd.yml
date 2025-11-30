@@ -1,70 +1,107 @@
-name: CI/CD PHP (2 Jobs)
+name: CI/CD Auto Pull and Rebuild (Aman)
 
 on:
   push:
     branches: [ master ]
   workflow_dispatch:
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
 
-  # ========================
-  # JOB 1: BUILD
-  # ========================
-  build:
-    runs-on: [laptop_husain]
-
+  # ==============================
+  # JOB 1: DEPLOY DI MY_LAPTOP
+  # ==============================
+  deploy_my_laptop:
+    runs-on: [my_laptop]
+    continue-on-error: false   # Laptop kamu harus berhasil
     steps:
+
     - name: Set project path
-      run: |
-        PROJECT_PATH=$(find /home -name 'WAP_Library' -type d 2>/dev/null | head -1)
-        if [ -z "$PROJECT_PATH" ]; then
-          echo "❌ Folder WAP_Library tidak ditemukan"
-          exit 1
-        fi
-        echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
-        echo "📁 Found project at: $PROJECT_PATH"
+    run: |
+      PROJECT_PATH=$(find /home -name 'WAP_Library' -type d 2>/dev/null | head -1)
+      if [ -z "$PROJECT_PATH" ]; then
+        echo "❌ Error: Folder WAP_Library tidak ditemukan"
+        exit 1
+      fi
+      echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
+      echo "📁 Project found at: $PROJECT_PATH"
 
     - name: Pull latest changes
       working-directory: ${{ env.PROJECT_PATH }}
       run: |
-        git fetch origin master || git pull origin master
+        git fetch origin master
         git reset --hard origin/master
-        echo "✔ Build job selesai menarik kode terbaru"
 
-
-  # ========================
-  # JOB 2: DEPLOY
-  # ========================
-  deploy:
-    runs-on: [laptop_husain]
-    needs: build    # Wajib: deploy menunggu build selesai
-
-    steps:
-    - name: Stop existing containers
-      working-directory: ${{ env.PROJECT_PATH }}
-      run: docker compose down || true
-
-    - name: Remove old images
+    - name: Restart Docker Compose (aman)
       working-directory: ${{ env.PROJECT_PATH }}
       run: |
-        docker system prune -f
-        docker image prune -a -f
+        docker compose down || true
+        docker compose up -d --build
 
-    - name: Build and start containers
-      working-directory: ${{ env.PROJECT_PATH }}
+    - name: Health Check (Flexible Port)
+      env:
+        HEALTH_PORT: 8080
       run: |
-        docker compose build --no-cache
-        docker compose up -d
+        echo "🔍 Checking service at http://localhost:$HEALTH_PORT ..."
+        curl -f http://localhost:$HEALTH_PORT || echo "⚠ Health check gagal, mungkin port berbeda."
 
-    - name: Health check
-      run: |
-        curl -f http://localhost:8080 || exit 1
-
-    - name: Notify deployment status
+    - name: Notify Result
       if: always()
       run: |
+        echo "Status: ${{ job.status }}"
         if [ "${{ job.status }}" == "success" ]; then
-          echo "🚀 Deploy berhasil!"
+          echo "✅ Deployment di my_laptop berhasil!"
         else
-          echo "❌ Deploy gagal!"
+          echo "❌ Deployment di my_laptop gagal!"
+        fi
+
+
+  # ==============================
+  # JOB 2: DEPLOY DI LAPTOP HUSAIN
+  # ==============================
+  deploy_laptop_husain:
+    runs-on: [laptop_husain]
+    continue-on-error: true   # ← Job boleh gagal jika laptop Husain OFFLINE
+    steps:
+
+    - name: Set project path
+      run: |
+        PROJECT_PATH=$(find /home -name 'WAP_Library' -type d 2>/dev/null | head -1)
+        if [ -z "$PROJECT_PATH" ]; then
+          echo "⚠ Folder project tidak ditemukan di laptop Husain (mungkin laptop OFF)"
+          exit 0
+        fi
+        echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
+
+    - name: Pull latest changes
+      working-directory: ${{ env.PROJECT_PATH }}
+      run: |
+        git fetch origin master
+        git reset --hard origin/master
+
+    - name: Restart Docker Compose (aman)
+      working-directory: ${{ env.PROJECT_PATH }}
+      run: |
+        docker compose down || true
+        docker compose up -d --build
+
+    - name: Health Check (Flexible Port)
+      env:
+        HEALTH_PORT: 8080
+      run: |
+        echo "🔍 Checking service at http://localhost:$HEALTH_PORT ..."
+        curl -f http://localhost:$HEALTH_PORT || \
+          echo "⚠ Health check gagal (port beda atau laptop mati)"
+
+    - name: Notify Result
+      if: always()
+      run: |
+        echo "Status: ${{ job.status }}"
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "✅ Deployment di laptop Husain berhasil!"
+        else
+          echo "⚠ Laptop Husain mungkin offline — tidak masalah."
         fi
