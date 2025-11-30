@@ -1,4 +1,4 @@
-name: CI/CD Auto Pull and Rebuild
+name: CI/CD PHP (2 Jobs)
 
 on:
   push:
@@ -6,96 +6,65 @@ on:
   workflow_dispatch:
 
 jobs:
-  my_laptop:
-  runs-on: [my_laptop]
 
-  steps:
-  - name: Checkout repository
-    uses: actions/checkout@v4
+  # ========================
+  # JOB 1: BUILD
+  # ========================
+  build:
+    runs-on: [laptop_husain]
 
-  - name: Pull latest changes
-    working-directory: ${{ github.workspace }}
-    run: |
-      git fetch origin master
-      git reset --hard origin/master
+    steps:
+    - name: Set project path
+      run: |
+        PROJECT_PATH=$(find /home -name 'WAP_Library' -type d 2>/dev/null | head -1)
+        if [ -z "$PROJECT_PATH" ]; then
+          echo "❌ Folder WAP_Library tidak ditemukan"
+          exit 1
+        fi
+        echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
+        echo "📁 Found project at: $PROJECT_PATH"
 
-  - name: Stop existing containers
-    working-directory: ${{ github.workspace }}
-    run: |
-      docker compose down || true
+    - name: Pull latest changes (BUILD JOB)
+      working-directory: ${{ env.PROJECT_PATH }}
+      run: |
+        git fetch origin master
+        git reset --hard origin/master
+        echo "✔ Build job selesai menarik kode terbaru"
 
-  - name: Remove old images
-    run: |
-      docker system prune -f
-      docker image prune -a -f
 
-  - name: Build and start containers
-    working-directory: ${{ github.workspace }}
-    run: |
-      docker compose build --no-cache
-      docker compose up -d
+  # ========================
+  # JOB 2: DEPLOY
+  # ========================
+  deploy:
+    runs-on: [laptop_husain]
+    needs: build    # Wajib: deploy menunggu build selesai
 
-  - name: Wait for services to be ready
-    run: |
-      sleep 30
-      docker compose -f ${{ github.workspace }}/docker-compose.yml ps
+    steps:
+    - name: Stop existing containers
+      working-directory: ${{ env.PROJECT_PATH }}
+      run: docker compose down || true
 
-  - name: Health check
-    run: |
-      curl -f http://localhost:8080 || exit 1
+    - name: Remove old images
+      working-directory: ${{ env.PROJECT_PATH }}
+      run: |
+        docker system prune -f
+        docker image prune -a -f
 
-  - name: Notify deployment status
-    if: always()
-    run: |
-      if [ ${{ job.status }} == 'success' ]; then
-        echo "✅ Deployment berhasil!"
-      else
-        echo "❌ Deployment gagal!"
-      fi
-laptop_husain:
-  runs-on: [laptop_husain]
+    - name: Build and start containers
+      working-directory: ${{ env.PROJECT_PATH }}
+      run: |
+        docker compose build --no-cache
+        docker compose up -d
 
-  steps:
-  - name: Checkout repository
-    uses: actions/checkout@v4
+    - name: Health check
+      run: |
+        curl -f http://localhost:8080 || exit 1
 
-  - name: Pull latest changes
-    working-directory: ${{ github.workspace }}
-    run: |
-      git fetch origin master
-      git reset --hard origin/master
-
-  - name: Stop existing containers
-    working-directory: ${{ github.workspace }}
-    run: |
-      docker compose down || true
-
-  - name: Remove old images
-    run: |
-      docker system prune -f
-      docker image prune -a -f
-
-  - name: Build and start containers
-    working-directory: ${{ github.workspace }}
-    run: |
-      docker compose build --no-cache
-      docker compose up -d
-
-  - name: Wait for services to be ready
-    run: |
-      sleep 30
-      docker compose -f ${{ github.workspace }}/docker-compose.yml ps
-
-  - name: Health check
-    run: |
-      curl -f http://localhost:8080 || exit 1
-
-  - name: Notify deployment status
-    if: always()
-    run: |
-      if [ ${{ job.status }} == 'success' ]; then
-        echo "✅ Deployment berhasil!"
-      else
-        echo "❌ Deployment gagal!"
-      fi
-
+    - name: Notify deployment status
+      if: always()
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "🚀 Deploy berhasil!"
+        else
+          echo "❌ Deploy gagal!"
+        fi
