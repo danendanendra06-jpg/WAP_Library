@@ -1,0 +1,63 @@
+name: CI/CD Auto Pull and Rebuild
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  php-todo-azka:
+    runs-on: [laptop_husain]
+    
+    steps:
+    - name: Set project path
+      run: |
+        PROJECT_PATH=$(find /home -name 'php-todo' -type d 2>/dev/null | head -1)
+        if [ -z "$PROJECT_PATH" ]; then
+          echo "❌ Error: Folder php-todo tidak ditemukan di /home"
+          exit 1
+        fi
+        echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
+        echo "✅ Found project at: $PROJECT_PATH"
+
+    - name: Pull latest changes
+      working-directory: ${{ env.PROJECT_PATH }}
+      run: |
+        git fetch origin master
+        git reset --hard origin/master
+
+    - name: Stop existing containers
+      working-directory: ${{ env.PROJECT_PATH }}
+      run: |
+        docker compose down || true
+
+    - name: Remove old images
+      working-directory: ${{ env.PROJECT_PATH }}
+      run: |
+        docker system prune -f
+        docker image prune -a -f
+
+    - name: Build and start containers
+      working-directory: ${{ env.PROJECT_PATH }}
+      run: |
+        docker compose build --no-cache
+        docker compose up -d
+
+    - name: Wait for services to be ready
+      working-directory: ${{ env.PROJECT_PATH }}
+      run: |
+        sleep 30
+        docker compose ps
+
+    - name: Health check
+      run: |
+        curl -f http://localhost:8080 || exit 1
+
+    - name: Notify deployment status
+      if: always()
+      run: |
+        if [ ${{ job.status }} == 'success' ]; then
+          echo "✅ Deployment berhasil!"
+        else
+          echo "❌ Deployment gagal!"
+        fi
