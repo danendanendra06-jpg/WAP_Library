@@ -12,7 +12,7 @@ jobs:
     steps:
     - name: Set project path
       run: |
-        PROJECT_PATH=$(find /home -name 'php-todo' -type d 2>/dev/null | head -1)
+        PROJECT_PATH=$(find /home -name 'WAP_Library' -type d 2>/dev/null | head -1)
         if [ -z "$PROJECT_PATH" ]; then
           echo "❌ Error: Folder php-todo tidak ditemukan di /home"
           exit 1
@@ -68,7 +68,7 @@ jobs:
     steps:
     - name: Set project path
       run: |
-        PROJECT_PATH=$(find /home -name 'php-todo' -type d 2>/dev/null | head -1)
+        PROJECT_PATH=$(find /home -name 'WAP_Libary' -type d 2>/dev/null | head -1)
         if [ -z "$PROJECT_PATH" ]; then
           echo "❌ Error: Folder php-todo tidak ditemukan di /home"
           exit 1
