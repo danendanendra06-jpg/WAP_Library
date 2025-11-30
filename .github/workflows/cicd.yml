@@ -16,47 +16,51 @@ jobs:
   # ==============================
   deploy_my_laptop:
     runs-on: [my_laptop]
-    continue-on-error: false   # Laptop kamu harus berhasil
+    continue-on-error: false
     steps:
 
-    - name: Set project path
-    run: |
-      PROJECT_PATH=$(find /home -name 'WAP_Library' -type d 2>/dev/null | head -1)
-      if [ -z "$PROJECT_PATH" ]; then
-        echo "❌ Error: Folder WAP_Library tidak ditemukan"
-        exit 1
-      fi
-      echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
-      echo "📁 Project found at: $PROJECT_PATH"
+      - name: Set project path
+        run: |
+          PROJECT_PATH=$(find /home -name 'WAP_Library' -type d 2>/dev/null | head -1)
 
-    - name: Pull latest changes
-      working-directory: ${{ env.PROJECT_PATH }}
-      run: |
-        git fetch origin master
-        git reset --hard origin/master
+          if [ -z "$PROJECT_PATH" ]; then
+            echo "❌ Folder WAP_Library tidak ditemukan"
+            exit 1
+          fi
 
-    - name: Restart Docker Compose (aman)
-      working-directory: ${{ env.PROJECT_PATH }}
-      run: |
-        docker compose down || true
-        docker compose up -d --build
+          echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
+          echo "📁 Project found at: $PROJECT_PATH"
 
-    - name: Health Check (Flexible Port)
-      env:
-        HEALTH_PORT: 8080
-      run: |
-        echo "🔍 Checking service at http://localhost:$HEALTH_PORT ..."
-        curl -f http://localhost:$HEALTH_PORT || echo "⚠ Health check gagal, mungkin port berbeda."
+      - name: Pull latest changes
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          git fetch origin master
+          git reset --hard origin/master
 
-    - name: Notify Result
-      if: always()
-      run: |
-        echo "Status: ${{ job.status }}"
-        if [ "${{ job.status }}" == "success" ]; then
-          echo "✅ Deployment di my_laptop berhasil!"
-        else
-          echo "❌ Deployment di my_laptop gagal!"
-        fi
+      - name: Restart Docker Compose (safe)
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          docker compose down || true
+          docker compose up -d --build
+
+      - name: Health Check
+        env:
+          HEALTH_PORT: 8080
+        run: |
+          echo "🔍 Checking service at http://localhost:$HEALTH_PORT ..."
+          curl -f http://localhost:$HEALTH_PORT || \
+            echo "⚠ Health check gagal, mungkin port berbeda."
+
+      - name: Notify Result
+        if: always()
+        run: |
+          echo "Status: ${{ job.status }}"
+
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment di my_laptop berhasil!"
+          else
+            echo "❌ Deployment di my_laptop gagal!"
+          fi
 
 
   # ==============================
@@ -64,44 +68,47 @@ jobs:
   # ==============================
   deploy_laptop_husain:
     runs-on: [laptop_husain]
-    continue-on-error: true   # ← Job boleh gagal jika laptop Husain OFFLINE
+    continue-on-error: true
     steps:
 
-    - name: Set project path
-      run: |
-        PROJECT_PATH=$(find /home -name 'WAP_Library' -type d 2>/dev/null | head -1)
-        if [ -z "$PROJECT_PATH" ]; then
-          echo "⚠ Folder project tidak ditemukan di laptop Husain (mungkin laptop OFF)"
-          exit 0
-        fi
-        echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
+      - name: Set project path
+        run: |
+          PROJECT_PATH=$(find /home -name 'WAP_Library' -type d 2>/dev/null | head -1)
 
-    - name: Pull latest changes
-      working-directory: ${{ env.PROJECT_PATH }}
-      run: |
-        git fetch origin master
-        git reset --hard origin/master
+          if [ -z "$PROJECT_PATH" ]; then
+            echo "⚠ Folder project tidak ditemukan di laptop Husain (mungkin laptop OFF)"
+            exit 0
+          fi
 
-    - name: Restart Docker Compose (aman)
-      working-directory: ${{ env.PROJECT_PATH }}
-      run: |
-        docker compose down || true
-        docker compose up -d --build
+          echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
 
-    - name: Health Check (Flexible Port)
-      env:
-        HEALTH_PORT: 8080
-      run: |
-        echo "🔍 Checking service at http://localhost:$HEALTH_PORT ..."
-        curl -f http://localhost:$HEALTH_PORT || \
-          echo "⚠ Health check gagal (port beda atau laptop mati)"
+      - name: Pull latest changes
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          git fetch origin master
+          git reset --hard origin/master
 
-    - name: Notify Result
-      if: always()
-      run: |
-        echo "Status: ${{ job.status }}"
-        if [ "${{ job.status }}" == "success" ]; then
-          echo "✅ Deployment di laptop Husain berhasil!"
-        else
-          echo "⚠ Laptop Husain mungkin offline — tidak masalah."
-        fi
+      - name: Restart Docker Compose (safe)
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          docker compose down || true
+          docker compose up -d --build
+
+      - name: Health Check
+        env:
+          HEALTH_PORT: 8080
+        run: |
+          echo "🔍 Checking service at http://localhost:$HEALTH_PORT ..."
+          curl -f http://localhost:$HEALTH_PORT || \
+            echo "⚠ Health check gagal (port beda atau laptop mati)"
+
+      - name: Notify Result
+        if: always()
+        run: |
+          echo "Status: ${{ job.status }}"
+
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment di laptop Husain berhasil!"
+          else
+            echo "⚠ Laptop Husain mungkin offline — tidak masalah."
+          fi
