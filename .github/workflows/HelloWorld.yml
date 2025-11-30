@@ -1,68 +1,22 @@
-name: CI/CD Auto Deploy Vehicle Wash
+name: Hello World Workflow
 
 on:
   push:
     branches: [ master ]
-  workflow_dispatch:
 
 jobs:
-
-  # =====================================================
-  # JOB 1 — DEPLOY KE LAPTOP ANDA (my_laptop)
-  # =====================================================
-  deploy_my_laptop:
-    runs-on: [my_laptop]
+  greeting:
+    runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout kode (WAJIB)
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Say Hello
+        run: echo "Hello, World! 👋"
 
-      # Step 2: Tentukan folder project
-      - name: Set project path
+      - name: Show Date and Time
+        run: echo "Current time is $(date) ⏱️"
+
+      - name: Show GitHub Info
         run: |
-          PROJECT_PATH="$HOME/web_vehiclewash"
-          echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
-          echo "📁 Project Path: $PROJECT_PATH"
-
-      # Step 3: Pull update dari GitHub
-      - name: Pull latest changes
-        working-directory: ${{ env.PROJECT_PATH }}
-        run: |
-          git fetch origin master
-          git reset --hard origin/master
-
-      # Step 4: Restart Docker
-      - name: Restart Docker Containers
-        working-directory: ${{ env.PROJECT_PATH }}
-        run: |
-          docker compose down || true
-          docker compose up -d --build
-
-  # =====================================================
-  # JOB 2 — DEPLOY KE LAPTOP HUSAIN
-  # =====================================================
-  deploy_husain:
-    runs-on: [laptop_husain]
-
-    steps:
-      # Step 1: Checkout kode
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Step 2: Tentukan folder project
-      - name: Set project path
-        run: |
-          PROJECT_PATH="$HOME/web_vehiclewash"
-          echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
-          echo "📁 Project Path: $PROJECT_PATH"
-
-      # Step 3: Tarik update dari GitHub
-      - name: Pull latest changes
-        working-directory: ${{ env.PROJECT_PATH }}
-        run: |
-          git fetch origin master
-          git reset --hard origin/master
-
-      # Step 4: Restart Docker
-      - name: Restart Docker Contain
+          echo "Repository: ${{ github.repository }}"
+          echo "Branch: ${{ github.ref }}"
+          echo "Commit: ${{ github.sha }}"
