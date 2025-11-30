@@ -1,0 +1,12 @@
+name: Test Runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-runner:
+    runs-on: [laptop_husain]   
+
+    steps:
+    - name: Print test message
+      run: echo "Runner berhasil digunakan!"
