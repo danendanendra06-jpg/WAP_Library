@@ -24,10 +24,10 @@ jobs:
         echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
         echo "📁 Found project at: $PROJECT_PATH"
 
-    - name: Pull latest changes (BUILD JOB)
+    - name: Pull latest changes
       working-directory: ${{ env.PROJECT_PATH }}
       run: |
-        git fetch origin master
+        git fetch origin master || git pull origin master
         git reset --hard origin/master
         echo "✔ Build job selesai menarik kode terbaru"
 
