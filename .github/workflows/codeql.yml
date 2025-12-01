@@ -32,11 +32,6 @@ jobs:
         include:
         - language: actions
           build-mode: none
-        # Add more languages if needed:
-        # - language: javascript-typescript
-        #   build-mode: none
-        # - language: python
-        #   build-mode: none
 
     steps:
     - name: Checkout repository
