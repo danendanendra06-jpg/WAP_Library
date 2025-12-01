@@ -1,6 +1,3 @@
-# CodeQL Security Scanning
-# Runs on GitHub-hosted runners (free for public repos)
-
 name: "CodeQL Advanced"
 
 on:
